@@ -1,6 +1,6 @@
 # YAG (Yet Another Git) 
 
 # Todo
-- [ ] create init
-- [ ] create arg parser
+- [X] create init
+- [X] create arg parser
 - [ ] create add
