@@ -1,3 +1,18 @@
+# I need 
+
+# app files 
+.yag/
+
+# temp files
+*.tmp
+.DS_Store 
+
+# test files
+*.txt
+
+
+
+# https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
