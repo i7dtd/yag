@@ -3,7 +3,7 @@ import os
 import shutil
 
 
-
+# yag init function. create requared files and path
 def init(args):
     if os.path.exists('.yag/refs/heads'):
         shutil.rmtree('.yag/refs/heads')
@@ -11,11 +11,21 @@ def init(args):
         shutil.rmtree('.yag/objects')
     os.makedirs('.yag/refs/heads')
     os.mkdir('.yag/objects')
-    with open(".yag/HEAD", 'w') as file:
+    with open('.yag/HEAD', 'w') as file:
         file.write("ref: refs/heads/main")
 
 
-def add(args):
+# save utils
+def getIgnoreList():
+    if os.path.exists('.yagignore'):
+        with open('.yagignore', 'r', encoding='utf-8') as file:
+            lines = file.read().splitlines()
+            return lines
+        
+    
+
+
+def save(args):
     pass
 
 def createParser():
@@ -29,6 +39,8 @@ def createParser():
     parserAdd = subparsers.add_parser('add', help='Add file contents to the index')
     parserAdd.add_argument('file', help='Add file')
 
+    parserCommit = subparsers.add_parser('commit', help='Record changes')
+
     return parser
 
 
@@ -38,6 +50,8 @@ def main():
     
     if args.command == 'init':
         init(args)
+    elif args.command == 'commit':
+        commit(args)
 
 if __name__ == "__main__":
     main()
