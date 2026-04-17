@@ -20,11 +20,22 @@ def getIgnoreList():
     if os.path.exists(".yagignore"):
         with open(".yagignore", "r", encoding="utf-8") as file:
             lines = file.read().splitlines()
-            return lines
+        return lines
         
+def getWalkList():
+    rezult = []
+    exludeDirs = {".yag", ".yagignore"}
+    for root, dirs, files in os.walk(".", topdown=True):
+        dirs[:] = [dir for dir in dirs if dir not in exludeDirs]
+        for file in files:
+            rezult.append(os.path.join(root, file)[2:])
+    return rezult
     
-
-
+def createBlob(filePath):
+    pass
+    
+    
+# yag add&commit in 1 function
 def save(args):
     pass
 
@@ -35,12 +46,9 @@ def createParser():
     
     parserInit = subparsers.add_parser("init", help="Create an empty Yag repository or reinitialize an existing one")
 
-    # add ? pass for 10 april
-    parserAdd = subparsers.add_parser("add", help="Add file contents to the index")
-    parserAdd.add_argument("file", help="Add file")
-
-    parserCommit = subparsers.add_parser("commit", help="Record changes")
-
+    # save ? pass for 17 april
+    parserSave = subparsers.add_parser("save", help="Add file contents to the index and record changes")
+    
     return parser
 
 
