@@ -3,4 +3,4 @@
 # Todo
 - [X] create init
 - [X] create arg parser
-- [ ] create add
+- [ ] create save (commit & add analog)
