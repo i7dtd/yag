@@ -1,6 +1,8 @@
 import argparse
 import os
+from pydoc import text
 import shutil
+import hashlib
 
 
 # yag init function. create requared files and path
@@ -31,8 +33,23 @@ def getWalkList():
             rezult.append(os.path.join(root, file)[2:])
     return rezult
     
-def createBlob(filePath):
-    pass
+def createBlob(path):
+    # create sha-1
+    with open(path, "rb") as file:
+        data = file.read()
+        dataSize = len(data)
+        blobStr = f"blob {dataSize}\0".encode("utf-8") + data
+        shaHash = hashlib.sha1(blobStr).hexdigest()
+        # check if exist
+        shaHashDir = shaHash[:2]
+        shaHashFileName = shaHash[2:]
+        # TODO: get walklist .yag/objects/
+        for fileName in getWalkList(".yag/objects/"):
+        
+        
+        
+        
+        
     
     
 # yag add&commit in 1 function
