@@ -24,6 +24,8 @@ def getIgnoreList():
         with open(".yagignore", "r", encoding="utf-8") as file:
             lines = file.read().splitlines()
         return lines
+    else:
+        return []
         
 def getWalkList():
     rezult = []
@@ -55,7 +57,8 @@ def createBlob(path):
         else:
             with open(".yag/objects/" + shaHashDir + "/" + shaHashFileName, 'wb') as file:
                 file.write(blobStr)
-            
+    
+    return shaHash    
 
 
 def createTree(dirPath, ignoreList):
@@ -134,12 +137,12 @@ def createCommit(message, treeHash):
     return commitDataHash    
 
         
-        
     
-    
-# yag add&commit in 1 function
 def save(args):
-    pass
+    if os.path.isdir(".yag"):
+        ignoreList = getIgnoreList()
+        treeHash = createTree(".", ignoreList)
+        createCommit(args.message, treeHash)
 
 def createParser():
     parser = argparse.ArgumentParser(prog="yag")
@@ -148,8 +151,9 @@ def createParser():
     
     parserInit = subparsers.add_parser("init", help="Create an empty Yag repository or reinitialize an existing one")
 
-    # save ? pass for 17 april
-    parserSave = subparsers.add_parser("save", help="Add file contents to the index and record changes")
+
+    parserSave = subparsers.add_parser("save", help="Save current state")
+    parserSave.add_argument("message", help="Commit message")
     
     return parser
 
@@ -161,6 +165,8 @@ def main():
     
     if args.command == "init":
         init(args)
+    if args.command == "save":
+        save(args)
 
 
 
