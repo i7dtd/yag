@@ -43,9 +43,20 @@ def createBlob(path):
         # check if exist
         shaHashDir = shaHash[:2]
         shaHashFileName = shaHash[2:]
-        # TODO: get walklist .yag/objects/
-        for fileName in getWalkList(".yag/objects/"):
+
+        if os.path.isdir(".yag/objects/" + shaHashDir):
+            pass
+        else:
+            os.makedirs(".yag/objects/" + shaHashDir)
+            
         
+        if os.path.exists(".yag/objects/" + shaHashDir + "/" + shaHashFileName):
+            pass
+        else:
+            with open(".yag/objects/" + shaHashDir + "/" + shaHashFileName, 'wb') as file:
+                file.write(blobStr)
+            
+    
         
         
         
