@@ -5,6 +5,7 @@ import shutil
 import hashlib
 import json
 from datetime import datetime
+from statistics import harmonic_mean
 
 # yag init function. create requared files and path
 def init(args):
@@ -157,6 +158,29 @@ def findCommit(shortID):
         print("Ambiguous ID, please clarify")
     elif len(match) == 1:
         return match[0]
+    
+
+def readObject(hash):
+    hashDir = hash[:2]
+    hashFileName = hash[2:]
+    fullHashPath = ".yag/objects/" + hashDir + "/" + hashFileName
+    
+    with open(fullHashPath, "rb") as file:
+        data = file.read()
+        zeroPos = data.find(b"\0")
+        header = data[:zeroPos]
+        inner = data[zeroPos + 1:]
+        
+        headerDecode = header.decode("utf-8").split()
+        if headerDecode[0] == "blob":
+            return headerDecode[0], inner
+        if headerDecode[0] == "tree" or headerDecode[0] == "commit":
+            innerDecode = inner.decode("utf-8")
+            jsonStr = json.loads(innerDecode)
+            return headerDecode[0], jsonStr
+            
+                
+            
     
 
     
