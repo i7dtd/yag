@@ -4,6 +4,7 @@ from pydoc import text
 import shutil
 import hashlib
 import json
+from datetime import datetime
 
 # yag init function. create requared files and path
 def init(args):
@@ -56,7 +57,7 @@ def createBlob(path):
                 file.write(blobStr)
             
 
-# TODO: create tree function 
+
 def createTree(dirPath, ignoreList):
     entries = {}
     exludeDirs = {".yag", ".yagignore"}
@@ -90,9 +91,48 @@ def createTree(dirPath, ignoreList):
         with open(".yag/objects/" + shaHashDir + "/" + shaHashFileName, 'wb') as file:
             file.write(treeData)
         
-    
     return treeDataHash
+    
+    
+    
+def createCommit(message, treeHash):
+    if os.path.isfile(".yag/refs/heads/main"):
+        with open(".yag/refs/heads/main", "r") as file:
+            parentHash = file.read()
+    else:
+        parentHash = None
+    
+    commit = {
+        "message":      message,
+        "timestamp":    datetime.now().isoformat(),
+        "tree":         treeHash,
+        "parent":       parentHash
+    }
+    
+    jsonStr = json.dumps(commit)
+    jsonBytes = jsonStr.encode("utf-8")
+    jsonBytesSize = len(jsonBytes)
+    commitData = f"commit {jsonBytesSize}\0".encode("utf-8") + jsonBytes
+    commitDataHash = hashlib.sha1(commitData).hexdigest()
+    
+    shaHashDir = commitDataHash[:2]
+    shaHashFileName = commitDataHash[2:]
+    
+    if os.path.isdir(".yag/objects/" + shaHashDir):
+        pass
+    else:
+        os.makedirs(".yag/objects/" + shaHashDir)
         
+    if os.path.exists(".yag/objects/" + shaHashDir + "/" + shaHashFileName):
+        pass
+    else:
+        with open(".yag/objects/" + shaHashDir + "/" + shaHashFileName, 'wb') as file:
+            file.write(commitData)
+    
+    with open(".yag/refs/heads/main", "w") as file:
+        file.write(commitDataHash)
+    return commitDataHash    
+
         
         
     
@@ -114,12 +154,15 @@ def createParser():
     return parser
 
 
+
 def main():
     parser = createParser()
     args = parser.parse_args()
     
     if args.command == "init":
         init(args)
+
+
 
 if __name__ == "__main__":
     main()
