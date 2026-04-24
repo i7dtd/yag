@@ -5,7 +5,7 @@ import shutil
 import hashlib
 import json
 from datetime import datetime
-from statistics import harmonic_mean
+# from statistics import harmonic_mean
 
 # yag init function. create requared files and path
 def init(args):
@@ -174,12 +174,22 @@ def readObject(hash):
         headerDecode = header.decode("utf-8").split()
         if headerDecode[0] == "blob":
             return headerDecode[0], inner
-        if headerDecode[0] == "tree" or headerDecode[0] == "commit":
+        if headerDecode[0] in ["tree","commit"]:
             innerDecode = inner.decode("utf-8")
             jsonStr = json.loads(innerDecode)
             return headerDecode[0], jsonStr
+        raise ValueError(f"Unknown object type: {headerDecode[0]}") # Workaround =D
             
-                
+            
+
+
+def restoreTree(treeHash, targetPath):
+    # XXX: maybe better remake readObject return. idk=]
+    objectType, data = readObject(treeHash)
+    if objectType != "tree":
+        return
+    else:
+        # TODO: data is byte. I need dict
             
     
 
@@ -193,7 +203,13 @@ def save(args):
 
 # TODO: create checkout (last ride)
 def checkout(args):
-    pass
+    if not os.path.isdir(".yag"):
+        print("Error: forget init yag")
+    shortID = args.id
+    fullHash = findCommit(shortID)
+    if fullHash == None:
+        return
+    
 
 def createParser():
     parser = argparse.ArgumentParser(prog="yag")
@@ -203,6 +219,9 @@ def createParser():
 
     parserSave = subparsers.add_parser("save", help="Save current state")
     parserSave.add_argument("message", help="Commit message")
+    
+    parserCheckout = subparsers.add_parser("checkout", help="Restore files to a saved state")
+    parserCheckout.add_argument("id", help="Commit ID")
     
     return parser
 
@@ -216,6 +235,8 @@ def main():
         init(args)
     if args.command == "save":
         save(args)
+    if args.command == "chekout":
+        checkout(args)
 
 
 
