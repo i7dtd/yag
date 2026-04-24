@@ -3,7 +3,7 @@ import os
 from pydoc import text
 import shutil
 import hashlib
-
+import json
 
 # yag init function. create requared files and path
 def init(args):
@@ -58,9 +58,40 @@ def createBlob(path):
 
 # TODO: create tree function 
 def createTree(dirPath, ignoreList):
-    rezult = []
-    getWalkList()
+    entries = {}
+    exludeDirs = {".yag", ".yagignore"}
+    for name in os.listdir(dirPath):
+        if name not in ignoreList and name not in exludeDirs:
+            fullPath = os.path.join(dirPath, name)
+            if os.path.isfile(fullPath):
+                blobHash = createBlob(fullPath)
+                entries[name] = {"type": "blob", "hash": blobHash}
+            if os.path.isdir(fullPath):
+                treeHash = createTree(fullPath, ignoreList)
+                entries[name] = {"type": "tree", "hash": treeHash}
+    
+    jsonStr = json.dumps(entries)
+    jsonBytes = jsonStr.encode("utf-8")
+    jsonBytesSize = len(jsonBytes)
+    treeData = f"tree {jsonBytesSize}\0".encode("utf-8") + jsonBytes
+    treeDataHash = hashlib.sha1(treeData).hexdigest()
+    
+    shaHashDir = treeDataHash[:2]
+    shaHashFileName = treeDataHash[2:]
 
+    if os.path.isdir(".yag/objects/" + shaHashDir):
+        pass
+    else:
+        os.makedirs(".yag/objects/" + shaHashDir)
+        
+    if os.path.exists(".yag/objects/" + shaHashDir + "/" + shaHashFileName):
+        pass
+    else:
+        with open(".yag/objects/" + shaHashDir + "/" + shaHashFileName, 'wb') as file:
+            file.write(treeData)
+        
+    
+    return treeDataHash
         
         
         
