@@ -49,7 +49,6 @@ def createBlob(path):
         else:
             os.makedirs(".yag/objects/" + shaHashDir)
             
-        
         if os.path.exists(".yag/objects/" + shaHashDir + "/" + shaHashFileName):
             pass
         else:
