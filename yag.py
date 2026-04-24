@@ -55,8 +55,12 @@ def createBlob(path):
             with open(".yag/objects/" + shaHashDir + "/" + shaHashFileName, 'wb') as file:
                 file.write(blobStr)
             
-    
-        
+
+# TODO: create tree function 
+def createTree(dirPath, ignoreList):
+    rezult = []
+    getWalkList()
+
         
         
         
