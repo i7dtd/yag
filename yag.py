@@ -18,7 +18,9 @@ def init(args):
         file.write("ref: refs/heads/main")
 
 
-# save utils
+# ========== #
+# save utils #
+# ========== #
 def getIgnoreList():
     if os.path.exists(".yagignore"):
         with open(".yagignore", "r", encoding="utf-8") as file:
@@ -136,7 +138,27 @@ def createCommit(message, treeHash):
         file.write(commitDataHash)
     return commitDataHash    
 
-        
+# ============== #
+# checkout utils #
+# ============== # 
+
+def findCommit(shortID):
+    match = []
+    for folder in os.listdir(".yag/objects/"):
+        for file in os.listdir(".yag/objects/" + folder):
+            name = folder + file
+    
+            if name.startswith(shortID):
+                match.append(name)
+    
+    if len(match) == 0:
+        print("Commit not found")
+    elif len(match) > 1:
+        print("Ambiguous ID, please clarify")
+    elif len(match) == 1:
+        return match[0]
+    
+
     
 def save(args):
     if os.path.isdir(".yag"):
@@ -144,13 +166,16 @@ def save(args):
         treeHash = createTree(".", ignoreList)
         createCommit(args.message, treeHash)
 
+
+# TODO: create checkout (last ride)
+def checkout(args):
+    pass
+
 def createParser():
     parser = argparse.ArgumentParser(prog="yag")
     subparsers = parser.add_subparsers(dest="command", required=True)
     
-    
     parserInit = subparsers.add_parser("init", help="Create an empty Yag repository or reinitialize an existing one")
-
 
     parserSave = subparsers.add_parser("save", help="Save current state")
     parserSave.add_argument("message", help="Commit message")
