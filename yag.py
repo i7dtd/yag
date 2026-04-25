@@ -1,4 +1,5 @@
 import argparse
+import sys
 import os
 from pydoc import text
 import shutil
@@ -187,10 +188,26 @@ def restoreTree(treeHash, targetPath):
     # XXX: maybe better remake readObject return. idk=]
     objectType, data = readObject(treeHash)
     if objectType != "tree":
+        print("error")
         return
-    else:
+
         # TODO: data is byte. I need dict
-            
+    for name, info in data.items():
+            fullPath = os.path.join(targetPath, name)
+            itemType = info["type"]
+            itemHash = info["hash"]
+    
+            if itemType == "blob":
+                objType, blobData = readObject(itemHash)
+                if objType != "blob":
+                    print(f"Error: expected blob for {name}, got {objType}")
+                    continue
+                
+                with open(fullPath, "wb") as f:
+                    f.write(blobData)
+                    
+            elif itemType == "tree":
+                restoreTree(itemHash, fullPath)
     
 
     
@@ -201,14 +218,24 @@ def save(args):
         createCommit(args.message, treeHash)
 
 
+
 # TODO: create checkout (last ride)
 def checkout(args):
     if not os.path.isdir(".yag"):
-        print("Error: forget init yag")
+        sys.exit("Error: forget init yag")
     shortID = args.id
     fullHash = findCommit(shortID)
     if fullHash == None:
         return
+    
+    _, commitData = readObject(fullHash)
+    if not isinstance(commitData, dict):
+        print("Error: expected commit object")
+        return
+    treeHash = commitData["tree"]
+    
+    restoreTree(treeHash, ".")
+    print("chekout is done")
     
 
 def createParser():
@@ -235,7 +262,7 @@ def main():
         init(args)
     if args.command == "save":
         save(args)
-    if args.command == "chekout":
+    if args.command == "checkout":
         checkout(args)
 
 
