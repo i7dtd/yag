@@ -33,7 +33,7 @@ def getIgnoreList():
         
 def getWalkList():
     rezult = []
-    exludeDirs = {".yag", ".yagignore"}
+    exludeDirs = {".yag", ".yagignore", ".git"}
     for root, dirs, files in os.walk(".", topdown=True):
         dirs[:] = [dir for dir in dirs if dir not in exludeDirs]
         for file in files:
